@@ -7,7 +7,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(cors({orgin: ["http://http://localhost:5173","https://upfront.onrender.com"]}));
 app.use(express.json());
 const port = 5000;
 
