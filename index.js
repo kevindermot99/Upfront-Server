@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 const port = 5000;
 const corsOptions = {
-  origin: 'https://upfront.onrender.com/#/forgotPassword',
+  origin: 'https://upfront.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -28,6 +28,17 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
+// get all users
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find(); // Fetch all users
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 // Login
 app.post("/api/login", async (req, res) => {
