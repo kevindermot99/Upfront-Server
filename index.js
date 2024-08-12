@@ -33,10 +33,9 @@ const User = mongoose.model("User", userSchema);
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find(); // Fetch all users
-    res.status(200).json(users);
+    res.json(users);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Server error" });
+    res.json({ msg: "Server error" });
   }
 });
 
