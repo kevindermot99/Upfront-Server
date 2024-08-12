@@ -55,16 +55,18 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+
 app.get("/api/verify", async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.query;
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(401).json({ msg   : "User doesn't exist" });
+    return res.status(401).json({ msg: "User doesn't exist" });
   }
 
-  res.status(200).json({ user: user });
+  res.status(200).json({ user });
 });
 
 app.listen(port, () => {
-  console.log(`Server is runnig on port: ${port}`);
+  console.log(`Server is running on port: ${port}`);
 });
+
