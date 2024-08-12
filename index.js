@@ -7,14 +7,15 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
 app.use(express.json());
 const port = 5000;
+const corsOptions = {
+  origin: 'https://upfront.onrender.com/#/forgotPassword',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGODB_URI);
 
