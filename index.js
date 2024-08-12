@@ -4,15 +4,14 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const port = 5000;
 
-mongoose.connect(
-  "mongodb+srv://mbonimpayekevin:mbonimpaye1@cluster0.56lqd.mongodb.net/upfront"
-);
+mongoose.connect(process.env.MONGODB_URI);
 
 const User = mongoose.model("users", {
   username: String,
