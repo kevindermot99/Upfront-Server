@@ -8,9 +8,8 @@ require("dotenv").config();
 
 const app = express();
 const corsOptions = {
-  origin: 'https://upfront.onrender.com',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
+  origin: ["https://upfront.onrender.com", "http://localhost:5173"],
+  methods: ["GET","POST",]
 };
 app.use(cors(corsOptions));
 app.use(express.json());
