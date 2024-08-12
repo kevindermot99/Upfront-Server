@@ -84,7 +84,6 @@ app.post("/api/verifyEmail", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 app.post("/api/verifyAnswer", async (req, res) => {
   const { email, answer } = req.body;
 
@@ -103,7 +102,6 @@ app.post("/api/verifyAnswer", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 app.post("/api/newPassword", async (req, res) => {
   const { email, password } = req.body;
 
