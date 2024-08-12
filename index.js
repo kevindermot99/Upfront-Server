@@ -29,6 +29,15 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+// Hello
+app.get('/', async (req, res) => {
+  try {
+    res.json({msg: "Hello World"});
+  } catch (error) {
+    res.json({ msg: "Server error" });
+  }
+});
+
 // get all users
 app.get('/api/users', async (req, res) => {
   try {
