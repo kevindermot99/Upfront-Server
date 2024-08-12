@@ -14,9 +14,11 @@ const port = 5000;
 mongoose.connect(process.env.MONGODB_URI);
 
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  username: String,
+  email: String,
+  password: String,
+  securityQ: String,
+  securityQAnswer: String,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -41,15 +43,15 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post("/api/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, securityQ, securityQAnswer } = req.body;
 
   try {
     if (await User.findOne({ email })) {
-      return res.status(409).json({ msg: "User already exists" });
+      return res.status(401).json({ msg: "User already exists" });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
+    const hashedAnswer = await bcrypt.hash(securityQAnswer, 10)
+    const newUser = new User({ username, email, password: hashedPassword, securityQ, securityQAnswer: hashedAnswer  });
     await newUser.save();
 
     res.json({ msg: "User registered successfully" });
@@ -59,20 +61,6 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-app.get("/api/verify", async (req, res) => {
-  const { email } = req.query;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ msg: "User doesn't exist" });
-    }
-
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
