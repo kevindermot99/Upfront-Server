@@ -9,14 +9,11 @@ const app = express();
 app.use(express.json());
 
 const port = 5000;
-
-const corsOptions = {
-  origin: ['*','https://upfront.onrender.com', 'https://upfronton.netlify.app','http://localhost:5173'],
+app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
-};
-app.use(cors(corsOptions));
+}));
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
