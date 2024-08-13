@@ -11,7 +11,7 @@ app.use(express.json());
 const port = 5000;
 
 const corsOptions = {
-  origin: ['*','https://upfront.onrender.com', 'http://localhost:5173'],
+  origin: ['*','https://upfront.onrender.com', 'https://upfronton.netlify.app/','http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
