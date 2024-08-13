@@ -75,11 +75,11 @@ app.post("/api/signup", async (req, res) => {
   try {
     if (await User.findOne({ email })) {
       return res.status(401).json({ msg: "User already exists" });
-    }
+    } 
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAnswer = await bcrypt.hash(securityQAnswer, 10);
     const newUser = new User({
-      userName,
+      username: userName,
       email,
       password: hashedPassword,
       securityQ,
@@ -87,7 +87,7 @@ app.post("/api/signup", async (req, res) => {
     });
     await newUser.save();
 
-    res.json({luemail: email,luname: userName});
+    res.status(200).json({luemail: email,luname: userName});
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
