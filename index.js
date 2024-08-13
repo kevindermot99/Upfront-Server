@@ -58,7 +58,7 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ msg: "User doesn't exist" });
     }
     if (await bcrypt.compare(password, user.password)) {
-      return res.status(200).json({ msg: "Login successful" });
+      return res.status(200).json({luemail: user.email,luname: user.username});
     } else {
       return res.status(401).json({ msg: "Incorrect Password" });
     }
@@ -70,7 +70,7 @@ app.post("/api/login", async (req, res) => {
 
 // Sign up
 app.post("/api/signup", async (req, res) => {
-  const { username, email, password, securityQ, securityQAnswer } = req.body;
+  const { userName, email, password, securityQ, securityQAnswer } = req.body;
 
   try {
     if (await User.findOne({ email })) {
@@ -79,7 +79,7 @@ app.post("/api/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAnswer = await bcrypt.hash(securityQAnswer, 10);
     const newUser = new User({
-      username,
+      userName,
       email,
       password: hashedPassword,
       securityQ,
@@ -87,7 +87,7 @@ app.post("/api/signup", async (req, res) => {
     });
     await newUser.save();
 
-    res.json({ msg: "User registered successfully" });
+    res.json({luemail: email,luname: userName});
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
