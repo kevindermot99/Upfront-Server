@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 const port = 5000;
 const corsOptions = {
-  origin: 'https://upfront.onrender.com',
+  origin: ['https://upfront.onrender.com', 'http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
