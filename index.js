@@ -1,7 +1,7 @@
 // index.js
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+// const cors = require("cors");
 require("dotenv").config();
 const errorHandler = require('./middleware/errorHandler');
 
@@ -9,11 +9,11 @@ const app = express();
 app.use(express.json());
 
 const port = 5000;
-app.use(cors({
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// app.use(cors({
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true
+// }));
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
