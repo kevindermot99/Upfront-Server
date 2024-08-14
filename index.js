@@ -13,7 +13,7 @@ app.use(express.json());
 const port = 5000;
 const corsOptions = {
   origin: ["https://upfront.onrender.com", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
@@ -51,9 +51,13 @@ app.post("/api/login", async (req, res) => {
     }
     if (await bcrypt.compare(password, user.password)) {
       const spaces = await Workspace.findOne({ user_email: email });
-      return res
-        .status(200)
-        .json({ luemail: user.email, luname: user.username, luw1: spaces.workspace1, luw2: spaces.workspace2, luw3: spaces.workspace3 });
+      return res.status(200).json({
+        luemail: user.email,
+        luname: user.username,
+        luw1: spaces.workspace1,
+        luw2: spaces.workspace2,
+        luw3: spaces.workspace3,
+      });
     } else {
       return res.status(401).json({ msg: "Incorrect Password" });
     }
@@ -82,14 +86,20 @@ app.post("/api/signup", async (req, res) => {
     });
     await newUser.save();
     const newWorkSpace = new Workspace({
-      workspace1: 'Workspace 1',
-      workspace2: 'Workspace 2',
-      workspace3: 'Workspace 3',
+      workspace1: "Workspace 1",
+      workspace2: "Workspace 2",
+      workspace3: "Workspace 3",
       user_email: email,
     });
     await newWorkSpace.save();
 
-    res.status(200).json({ luemail: email, luname: userName, luw1: 'Workspace 1', luw2: 'Workspace 2', luw3: 'Workspace 3' });
+    res.status(200).json({
+      luemail: email,
+      luname: userName,
+      luw1: "Workspace 1",
+      luw2: "Workspace 2",
+      luw3: "Workspace 3",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
@@ -142,6 +152,28 @@ app.post("/api/newPassword", async (req, res) => {
     res.status(200).json({ msg: "Password updated successfully" });
   } catch (error) {
     res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// Update workspace1
+app.patch("/api/updateWorkspace1", async (req, res) => {
+  const { w1, userEmail } = req.body;
+  try {
+    const result = await Workspace.findOneAndUpdate(
+      { user_email: userEmail },
+      { workspace1: w1 },
+      { new: true }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error updating workspace", error: err.message });
   }
 });
 
