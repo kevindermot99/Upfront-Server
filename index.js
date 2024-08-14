@@ -177,6 +177,20 @@ app.patch("/api/updateWorkspace1", async (req, res) => {
   }
 });
 
+// get users workspaces
+app.get("/api/workspaces", async (req, res) => {
+  const userEmail = req.query.userEmail
+  try {
+    const user = await User.findOne({ email: userEmail });
+    if (!user) return res.status(401).json({ msg: "User not found" });
+    
+    const space = await Workspace.findOne({ user_email: userEmail});
+    res.json({dbw1: space.workspace1, dbw2: space.workspace2, dbw3: space.workspace3});
+  } catch (error) {
+    res.json({ msg: "Server error", error: error });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
