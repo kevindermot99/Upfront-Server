@@ -5,41 +5,33 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 require("dotenv").config();
+const User = require("./models/user");
+const Workspace = require("./models/workspaces");
 
 const app = express();
 app.use(express.json());
 const port = 5000;
 const corsOptions = {
-  origin: ['https://upfront.onrender.com', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  origin: ["https://upfront.onrender.com", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGODB_URI);
 
-const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
-  securityQ: String,
-  securityQAnswer: String,
-});
-
-const User = mongoose.model("User", userSchema);
-
 // Hello
-app.get('/', async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    res.json({msg: "Hello World"});
+    res.json({ msg: "Hello World" });
   } catch (error) {
     res.json({ msg: "Server error" });
   }
 });
 
 // get all users
-app.get('/api/users', async (req, res) => {
+app.get("/api/users", async (req, res) => {
   try {
     const users = await User.find(); // Fetch all users
     res.json(users);
@@ -58,7 +50,10 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ msg: "User doesn't exist" });
     }
     if (await bcrypt.compare(password, user.password)) {
-      return res.status(200).json({luemail: user.email,luname: user.username});
+      const spaces = await Workspace.findOne({ user_email: email });
+      return res
+        .status(200)
+        .json({ luemail: user.email, luname: user.username, luw1: spaces.workspace1, luw2: spaces.workspace2, luw3: spaces.workspace3 });
     } else {
       return res.status(401).json({ msg: "Incorrect Password" });
     }
@@ -75,7 +70,7 @@ app.post("/api/signup", async (req, res) => {
   try {
     if (await User.findOne({ email })) {
       return res.status(401).json({ msg: "User already exists" });
-    } 
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAnswer = await bcrypt.hash(securityQAnswer, 10);
     const newUser = new User({
@@ -86,8 +81,15 @@ app.post("/api/signup", async (req, res) => {
       securityQAnswer: hashedAnswer,
     });
     await newUser.save();
+    const newWorkSpace = new Workspace({
+      workspace1: 'Workspace 1',
+      workspace2: 'Workspace 2',
+      workspace3: 'Workspace 3',
+      user_email: email,
+    });
+    await newWorkSpace.save();
 
-    res.status(200).json({luemail: email,luname: userName});
+    res.status(200).json({ luemail: email, luname: userName, luw1: 'Workspace 1', luw2: 'Workspace 2', luw3: 'Workspace 3' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
