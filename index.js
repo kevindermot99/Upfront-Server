@@ -177,6 +177,28 @@ app.patch("/api/updateWorkspace1", async (req, res) => {
   }
 });
 
+// Update workspace1
+app.patch("/api/updateWorkspace2", async (req, res) => {
+  const { w2, userEmail } = req.body;
+  try {
+    const result = await Workspace.findOneAndUpdate(
+      { user_email: userEmail },
+      { workspace2: w2 },
+      { new: true }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error updating workspace", error: err.message });
+  }
+});
+
 // get users workspaces
 app.get("/api/workspaces", async (req, res) => {
   const userEmail = req.query.userEmail
