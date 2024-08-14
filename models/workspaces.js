@@ -10,7 +10,7 @@ const workspaceSchema = new mongoose.Schema({
 });
 
 // Create the model
-const Workspace = mongoose.model('workspace', workspaceSchema);
+const Workspace = mongoose.model('Workspace', workspaceSchema);
 
 // Export the model
 module.exports = Workspace;
