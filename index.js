@@ -259,7 +259,20 @@ app.post("/api/createProject", async (req, res) => {
   }
 });
 
+// get Project data
+app.get("/api/getproject", async (req, res) => {
+  const id = req.query.id;
+  const userEmail = req.query.userEmail;
+  try {
+    const user = await User.findOne({ email: userEmail });
+    if (!user) return res.status(401).json({ msg: "User not found" });
 
+    const project = await Project.findOne({ _id: id, user_email: userEmail });
+    res.status(200).json(project);
+  } catch (error) {
+    res.json({ msg: "Server error", error: error });
+  }
+});
 
 
 
