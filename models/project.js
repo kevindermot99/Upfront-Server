@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
   emoji: { type: String, required: true },
   name: { type: String, required: true },
-  desc: { type: String, required: true }, // Removed unique constraint
+  desc: { type: String, required: true },
   user_email: { type: String, required: true },
 });
 
