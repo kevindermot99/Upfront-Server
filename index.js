@@ -252,7 +252,7 @@ app.post("/api/createProject", async (req, res) => {
       user_email: userEmail,
     }).save();
 
-    res.status(200).json(newProject);
+    res.status(200).json({id: newProject._id});
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Error creating project.", details: error.message });
