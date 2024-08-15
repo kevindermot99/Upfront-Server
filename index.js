@@ -214,7 +214,7 @@ app.patch("/api/updateWorkspace3", async (req, res) => {
     }
 
     res.status(200).json(result);
-  } catch (err) {
+q  } catch (err) {
     res
       .status(500)
       .json({ message: "Error updating workspace", error: err.message });
