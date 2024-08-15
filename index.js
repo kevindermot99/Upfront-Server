@@ -7,6 +7,7 @@ const cors = require("cors");
 require("dotenv").config();
 const User = require("./models/user");
 const Workspace = require("./models/workspaces");
+const Project = require("./models/project");
 
 const app = express();
 app.use(express.json());
@@ -214,7 +215,8 @@ app.patch("/api/updateWorkspace3", async (req, res) => {
     }
 
     res.status(200).json(result);
-q  } catch (err) {
+    q;
+  } catch (err) {
     res
       .status(500)
       .json({ message: "Error updating workspace", error: err.message });
@@ -223,17 +225,49 @@ q  } catch (err) {
 
 // get users workspaces
 app.get("/api/workspaces", async (req, res) => {
-  const userEmail = req.query.userEmail
+  const userEmail = req.query.userEmail;
   try {
     const user = await User.findOne({ email: userEmail });
     if (!user) return res.status(401).json({ msg: "User not found" });
-    
-    const space = await Workspace.findOne({ user_email: userEmail});
-    res.json({dbw1: space.workspace1, dbw2: space.workspace2, dbw3: space.workspace3});
+
+    const space = await Workspace.findOne({ user_email: userEmail });
+    res.json({
+      dbw1: space.workspace1,
+      dbw2: space.workspace2,
+      dbw3: space.workspace3,
+    });
   } catch (error) {
     res.json({ msg: "Server error", error: error });
   }
 });
+
+// create project
+app.post("/api/createProject", async (req, res) => {
+  const { emoji, name, desc, userEmail } = req.body;
+  try {
+    const newProject = await new Project({
+      emoji: emoji.toString(),
+      name,
+      desc,
+      user_email: userEmail,
+    }).save();
+
+    res.status(200).json(newProject);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Error creating project.", details: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
