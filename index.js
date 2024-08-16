@@ -232,6 +232,7 @@ app.post("/api/createProject", async (req, res) => {
       desc,
       user_email: userEmail,
       workspace: workspaceName,
+      curentStatus: 'active',
       collaborations, // Added the collaborations array
     }).save();
 
