@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 
+
 // Define the user schema
 const projectSchema = new mongoose.Schema({
-  emoji: { type: String, required: true },
-  name: { type: String, required: true },
-  desc: { type: String, required: true },
-  user_email: { type: String, required: true },
+  name: { type: String, required: false },
+  desc: { type: String, required: false },
+  user_email: { type: String, required: false },
+  workspace: { type: String, required: false },
 });
 
 // Create the model
