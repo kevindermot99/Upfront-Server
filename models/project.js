@@ -7,6 +7,7 @@ const projectSchema = new mongoose.Schema({
   desc: { type: String, required: false },
   user_email: { type: String, required: false },
   workspace: { type: String, required: false },
+  curentStatus: { type: String, required: false },
   collaborations: [{ type: String, required: false, match: /.+\@.+\..+/ }]
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
