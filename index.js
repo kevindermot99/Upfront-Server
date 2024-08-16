@@ -45,7 +45,7 @@ app.post("/api/login", async (req, res) => {
       return res.status(200).json({
         luemail: user.email,
         luname: user.username,
-        luw1: spaces.workspace1.name,
+        luw1: spaces.workspace1,
       });
     } else {
       return res.status(401).json({ msg: "Incorrect Password" });
@@ -208,7 +208,7 @@ app.get("/api/getmyprojects", async (req, res) => {
 
 // create project
 app.post("/api/createProject", async (req, res) => {
-  const { name, desc, userEmail, workspace } = req.body;
+  const { name, desc, userEmail, workspace, collaborations } = req.body; // Added collaborations
   try {
     // Find the workspace by userEmail
     const workspaceDoc = await Workspace.findOne({ user_email: userEmail });
@@ -226,16 +226,18 @@ app.post("/api/createProject", async (req, res) => {
       return res.status(400).json({ error: "Invalid workspace identifier." });
     }
 
+    // Create the new project with the provided data
     const newProject = await new Project({
       name,
       desc,
       user_email: userEmail,
       workspace: workspaceName,
+      collaborations, // Added the collaborations array
     }).save();
 
     res
       .status(200)
-      .json({ id: newProject._id, workspace: newProject.workspace });
+      .json({ id: newProject._id, workspace: newProject.workspace, createdAt: newProject.createdAt }); // Return createdAt
   } catch (error) {
     console.error("Error:", error);
     res
@@ -243,6 +245,7 @@ app.post("/api/createProject", async (req, res) => {
       .json({ error: "Error creating project.", details: error.message });
   }
 });
+
 
 // get Project data
 app.get("/api/getproject", async (req, res) => {
