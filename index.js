@@ -31,7 +31,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-
 // Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
@@ -183,13 +182,27 @@ app.get("/api/workspaces", async (req, res) => {
 app.get("/api/getme", async (req, res) => {
   const { email } = req.query;
   try {
-    const user = await User.findOne({ email: email }); // Fetch all users
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(401).json({ msg: " hehehe! get out" });
     }
-    res.status(200).json({msg: "Okay, you're good to go"});
+    res.status(200).json({ msg: "Okay, you're good to go" });
   } catch (error) {
     res.status(401).json({ msg: "Server error" });
+  }
+});
+
+// get my projects
+app.get("/api/getmyprojects", async (req, res) => {
+  const { email } = req.query;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(401).json({ msg: "User not found" });
+
+    const projects = await Project.find({ user_email: email });
+    res.status(200).json({projects: projects,});
+  } catch (error) {
+    res.status(400).json({ msg: "Server error", error: error });
   }
 });
 
