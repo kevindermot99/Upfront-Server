@@ -178,6 +178,16 @@ app.get("/api/workspaces", async (req, res) => {
   }
 });
 
+// get users
+app.get("/api/getusers", async (req, res) => {
+  try {
+    const users = await User.find().select('email _id');
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch users", error: error.message });
+  }
+});
+
 // get me
 app.get("/api/getme", async (req, res) => {
   const { email } = req.query;
