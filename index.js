@@ -335,7 +335,10 @@ app.get('/api/getcollaborations', async (req, res) => {
   }
 
   try {
-    const projects = await Project.find({ collaborations: email }).select('name _id');
+    const projects = await Project.find({
+      collaborations: email,
+      user_email: { $ne: email }
+    }).select('name _id user_email');
     res.status(200).json({ projects });
   } catch (error) {
     console.error(error);
