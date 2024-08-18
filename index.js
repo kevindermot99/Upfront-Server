@@ -326,6 +326,23 @@ app.post("/api/removecollaborator", async (req, res) => {
   }
 });
 
+// Get my collaborations
+app.get('/api/getcollaborations', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ msg: 'Email is required' });
+  }
+
+  try {
+    const projects = await Project.find({ collaborations: email }).select('name _id');
+    res.status(200).json({ projects });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
