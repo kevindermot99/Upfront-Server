@@ -287,14 +287,39 @@ app.post("/api/addcollaborator", async (req, res) => {
 
     // Check if the email is already in the collaborations array
     if (project.collaborations.includes(email)) {
-      return res.status(400).json({ msg: "Email is already a collaborator" });
+      return res.status(400).json({ msg: "User already a collaborator" });
     }
 
     // Add the new collaborator to the collaborations array
     project.collaborations.push(email);
     await project.save();
 
-    res.status(200).json({ msg: "Collaborator added successfully" });
+    res.status(200).json({newCollaborators: project.collaborations, msg: "Collaborator added successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// remove collaborator
+app.post("/api/removecollaborator", async (req, res) => {
+  const { projectId, email } = req.body;
+
+  try {
+    // Find the project by ID
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: "Project not found" });
+
+    // Check if the email is in the collaborations array
+    if (!project.collaborations.includes(email)) {
+      return res.status(400).json({ msg: "User is not a collaborator" });
+    }
+
+    // Remove the collaborator from the collaborations array
+    project.collaborations = project.collaborations.filter(collab => collab !== email);
+    await project.save();
+
+    res.status(200).json({newCollaborators: project.collaborations, msg: "Collaborator removed successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
