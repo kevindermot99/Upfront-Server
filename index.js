@@ -181,10 +181,12 @@ app.get("/api/workspaces", async (req, res) => {
 // get users
 app.get("/api/getusers", async (req, res) => {
   try {
-    const users = await User.find().select('email _id');
+    const users = await User.find().select("email _id");
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch users", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch users", error: error.message });
   }
 });
 
@@ -210,7 +212,7 @@ app.get("/api/getmyprojects", async (req, res) => {
     if (!user) return res.status(401).json({ msg: "User not found" });
 
     const projects = await Project.find({ user_email: email });
-    res.status(200).json({projects: projects,});
+    res.status(200).json({ projects: projects });
   } catch (error) {
     res.status(400).json({ msg: "Server error", error: error });
   }
@@ -242,13 +244,17 @@ app.post("/api/createProject", async (req, res) => {
       desc,
       user_email: userEmail,
       workspace: workspaceName,
-      curentStatus: 'active',
+      curentStatus: "active",
       collaborations, // Added the collaborations array
     }).save();
 
     res
       .status(200)
-      .json({ id: newProject._id, workspace: newProject.workspace, createdAt: newProject.createdAt }); // Return createdAt
+      .json({
+        id: newProject._id,
+        workspace: newProject.workspace,
+        createdAt: newProject.createdAt,
+      }); // Return createdAt
   } catch (error) {
     console.error("Error:", error);
     res
@@ -278,11 +284,11 @@ app.get("/api/getproject", async (req, res) => {
 
 // add collaborator
 app.post("/api/addcollaborator", async (req, res) => {
-  const { projectId, email } = req.body;
+  const { id, email } = req.body;
 
   try {
     // Find the project by ID
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(id);
     if (!project) return res.status(404).json({ msg: "Project not found" });
 
     // Check if the email is already in the collaborations array
@@ -294,7 +300,12 @@ app.post("/api/addcollaborator", async (req, res) => {
     project.collaborations.push(email);
     await project.save();
 
-    res.status(200).json({newCollaborators: project.collaborations, msg: "Collaborator added successfully" });
+    res
+      .status(200)
+      .json({
+        newCollaborators: project.collaborations,
+        msg: "Collaborator added successfully",
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
@@ -303,11 +314,11 @@ app.post("/api/addcollaborator", async (req, res) => {
 
 // remove collaborator
 app.post("/api/removecollaborator", async (req, res) => {
-  const { projectId, email } = req.body;
+  const { id, email } = req.body;
 
   try {
     // Find the project by ID
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(id);
     if (!project) return res.status(404).json({ msg: "Project not found" });
 
     // Check if the email is in the collaborations array
@@ -316,10 +327,17 @@ app.post("/api/removecollaborator", async (req, res) => {
     }
 
     // Remove the collaborator from the collaborations array
-    project.collaborations = project.collaborations.filter(collab => collab !== email);
+    project.collaborations = project.collaborations.filter(
+      (collab) => collab !== email
+    );
     await project.save();
 
-    res.status(200).json({newCollaborators: project.collaborations, msg: "Collaborator removed successfully" });
+    res
+      .status(200)
+      .json({
+        newCollaborators: project.collaborations,
+        msg: "Collaborator removed successfully",
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
@@ -327,25 +345,42 @@ app.post("/api/removecollaborator", async (req, res) => {
 });
 
 // Get my collaborations
-app.get('/api/getcollaborations', async (req, res) => {
+app.get("/api/getcollaborations", async (req, res) => {
   const { email } = req.query;
 
   if (!email) {
-    return res.status(400).json({ msg: 'Email is required' });
+    return res.status(400).json({ msg: "Email is required" });
   }
 
   try {
     const projects = await Project.find({
       collaborations: email,
-      user_email: { $ne: email }
-    }).select('name _id user_email');
+      user_email: { $ne: email },
+    }).select("name _id user_email");
     res.status(200).json({ projects });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: "Server error" });
   }
 });
 
+// Update project
+app.patch("/api/updateprojectdetails", async (req, res) => {
+  const { newTitle, newDesc, projectid, userEmail } = req.body;
+  try {
+    const project = await Project.findOneAndUpdate(
+      { _id: projectid, user_email: userEmail },
+      { name: newTitle, desc: newDesc },
+      { new: true } // Return the updated document
+    );
+
+    if (!project) return res.status(404).json({ message: "ndaq Project not found" });
+
+    res.status(200).json({ name: project.name, desc: project.desc });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
