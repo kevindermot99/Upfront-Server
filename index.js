@@ -8,6 +8,7 @@ require("dotenv").config();
 const User = require("./models/user");
 const Workspace = require("./models/workspaces");
 const Project = require("./models/project");
+const TrashProject = require("./models/trashProject");
 
 const app = express();
 app.use(express.json());
@@ -248,13 +249,11 @@ app.post("/api/createProject", async (req, res) => {
       collaborations, // Added the collaborations array
     }).save();
 
-    res
-      .status(200)
-      .json({
-        id: newProject._id,
-        workspace: newProject.workspace,
-        createdAt: newProject.createdAt,
-      }); // Return createdAt
+    res.status(200).json({
+      id: newProject._id,
+      workspace: newProject.workspace,
+      createdAt: newProject.createdAt,
+    }); // Return createdAt
   } catch (error) {
     console.error("Error:", error);
     res
@@ -300,12 +299,10 @@ app.post("/api/addcollaborator", async (req, res) => {
     project.collaborations.push(email);
     await project.save();
 
-    res
-      .status(200)
-      .json({
-        newCollaborators: project.collaborations,
-        msg: "Collaborator added successfully",
-      });
+    res.status(200).json({
+      newCollaborators: project.collaborations,
+      msg: "Collaborator added successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
@@ -332,12 +329,10 @@ app.post("/api/removecollaborator", async (req, res) => {
     );
     await project.save();
 
-    res
-      .status(200)
-      .json({
-        newCollaborators: project.collaborations,
-        msg: "Collaborator removed successfully",
-      });
+    res.status(200).json({
+      newCollaborators: project.collaborations,
+      msg: "Collaborator removed successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Server error" });
@@ -374,13 +369,49 @@ app.patch("/api/updateprojectdetails", async (req, res) => {
       { new: true } // Return the updated document
     );
 
-    if (!project) return res.status(404).json({ message: "ndaq Project not found" });
+    if (!project)
+      return res.status(404).json({ message: "ndaq Project not found" });
 
     res.status(200).json({ name: project.name, desc: project.desc });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+// delete project
+app.post("/api/movetotrash", async (req, res) => {
+  const { projectId, userEmail } = req.body;
+  try {
+    const project = await Project.findOne({
+      _id: projectId,
+      user_email: userEmail,
+    });
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Create the new project with the provided data
+    const trashedProject = await new TrashProject({
+      _id: project._id,
+      name: project.name,
+      desc: project.desc,
+      user_email: project.user_email,
+      workspace: project.workspace,
+      curentStatus: project.curentStatus,
+      collaborations: project.collaborations,
+    }).save();
+
+    // delete the data in project model
+    await Project.deleteOne({
+      _id: projectId,
+      user_email: userEmail,
+    });
+    return res.status(200).json({ message: "Project moved to trash" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
