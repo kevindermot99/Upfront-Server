@@ -257,7 +257,6 @@ app.post("/api/createProject", async (req, res) => {
   }
 });
 
-
 // get Project data
 app.get("/api/getproject", async (req, res) => {
   const id = req.query.id;
@@ -274,6 +273,22 @@ app.get("/api/getproject", async (req, res) => {
     res.status(200).json(project);
   } catch (error) {
     res.status(400).json({ msg: "Server error", error: error });
+  }
+});
+
+// add collaborator
+app.post("/api/addcollaborator", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ msg: "User not found" });
+
+    // add collaborator
+
+    res.status(200).json({ msg: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ msg: "Server error" });
   }
 });
 
