@@ -278,16 +278,25 @@ app.get("/api/getproject", async (req, res) => {
 
 // add collaborator
 app.post("/api/addcollaborator", async (req, res) => {
-  const { email } = req.body;
+  const { projectId, email } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ msg: "User not found" });
+    // Find the project by ID
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: "Project not found" });
 
-    // add collaborator
+    // Check if the email is already in the collaborations array
+    if (project.collaborations.includes(email)) {
+      return res.status(400).json({ msg: "Email is already a collaborator" });
+    }
 
-    res.status(200).json({ msg: "Password updated successfully" });
+    // Add the new collaborator to the collaborations array
+    project.collaborations.push(email);
+    await project.save();
+
+    res.status(200).json({ msg: "Collaborator added successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: "Server error" });
   }
 });
