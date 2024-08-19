@@ -231,10 +231,10 @@ app.post("/api/createProject", async (req, res) => {
         .status(404)
         .json({ error: "Workspace not found for the given user email." });
     }
-    let workspaceName;
+    let workspaceId;
 
     if (workspace === "w1") {
-      workspaceName = workspaceDoc.workspace1;
+      workspaceId = workspaceDoc._id;
     } else {
       return res.status(400).json({ error: "Invalid workspace identifier." });
     }
@@ -244,7 +244,7 @@ app.post("/api/createProject", async (req, res) => {
       name,
       desc,
       user_email: userEmail,
-      workspace: workspaceName,
+      workspace: workspaceId,
       curentStatus: "active",
       collaborations, // Added the collaborations array
     }).save();
