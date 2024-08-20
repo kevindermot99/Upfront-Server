@@ -9,7 +9,7 @@ const projectSchema = new mongoose.Schema({
   workspace: { type: String, required: false },
   curentStatus: { type: String, required: false },
   collaborations: [{ type: String, required: false, match: /.+\@.+\..+/ }]
-}, { timestamps: { createdAt: true, updatedAt: false } });
+}, { timestamps: { createdAt: true, updatedAt: true } });
 
 // Create the model
 const Project = mongoose.model("project", projectSchema);
