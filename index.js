@@ -517,11 +517,13 @@ app.post("/api/newtask", async (req, res) => {
     }).save();
 
     res.status(200).json({
+      id: newTask._id,
       name: newTask.name,
       priority: newTask.priority,
       assignedTo: newTask.assignedTo,
       startingOn: newTask.startingOn,
       due: newTask.due,
+      boardId: newTask.boardId,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -550,6 +552,7 @@ app.get("/api/gettasks", async (req, res) => {
       assignedTo: task.assignedTo,
       startingOn: task.startingOn,
       due: task.due,
+      boardId: task.boardId,
     })); 
 
     res.status(200).json(taskData);
