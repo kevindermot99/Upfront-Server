@@ -10,6 +10,7 @@ const Workspace = require("./models/workspaces");
 const Project = require("./models/project");
 const TrashProject = require("./models/trashProject");
 const Board = require("./models/board");
+const Task = require("./models/task");
 
 const app = express();
 app.use(express.json());
@@ -474,14 +475,15 @@ app.post("/api/newtask", async (req, res) => {
   const {
     newTaskName,
     newTaskDue,
+    startingOn,
     newTaskPriority,
     assignedTo,
     boardId,
     projectId,
     userEmail,
-  } = req.body; // Added collaborations
+  } = req.body;
   try {
-    // Find the workspace by userEmail
+    // Find the project by id and userEmail
     const project = await Project.findOne({
       _id: projectId,
       user_email: userEmail,
@@ -491,22 +493,41 @@ app.post("/api/newtask", async (req, res) => {
       return res.status(404).json({ error: "Project not found." });
     }
 
-    // Create the new project with the provided data
-    const newBoard = await new Board({
-      name: newBoardValue,
-      projectId: projectId,
+    // Find the board by id and userEmail
+    const board = await Board.findOne({
+      _id: boardId,
       user_email: userEmail,
+    });
+
+    if (!board) {
+      return res.status(404).json({ error: "Board not found." });
+    }
+
+    // Create the new task with the provided data
+    const newTask = await new Task({
+      name: newTaskName,
+      startingOn: startingOn,
+      due: newTaskDue,
+      priority: newTaskPriority,
+      boardId: boardId,
+      curentStatus: "active",
+      projectId: projectId,
+      userEmail: userEmail,
+      assignedTo: assignedTo,
     }).save();
 
     res.status(200).json({
-      id: newBoard._id,
-      name: newBoard.name,
+      name: newTask.name,
+      priority: newTask.priority,
+      assignedTo: newTask.assignedTo,
+      startingOn: newTask.startingOn,
+      due: newTask.due,
     });
   } catch (error) {
     console.error("Error:", error);
     res
       .status(500)
-      .json({ error: "Error creating project.", details: error.message });
+      .json({ error: "Error creating Task.", details: error.message });
   }
 });
 
