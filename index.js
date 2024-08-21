@@ -453,9 +453,12 @@ app.get("/api/getboards", async (req, res) => {
     const project = await Project.findOne({ user_email: email });
     if (!project) return res.status(401).json({ msg: "project not found" });
 
-    const boards = await Board.find({ projectId: projectId, user_email: email });
+    const boards = await Board.find({
+      projectId: projectId,
+      user_email: email,
+    });
     // Map over boards to extract the id and name
-    const boardData = boards.map(board => ({
+    const boardData = boards.map((board) => ({
       id: board._id,
       name: board.name,
     }));
@@ -468,7 +471,15 @@ app.get("/api/getboards", async (req, res) => {
 
 // create Task
 app.post("/api/newtask", async (req, res) => {
-  const { newBoardValue, projectId, userEmail } = req.body; // Added collaborations
+  const {
+    newTaskName,
+    newTaskDue,
+    newTaskPriority,
+    assignedTo,
+    boardId,
+    projectId,
+    userEmail,
+  } = req.body; // Added collaborations
   try {
     // Find the workspace by userEmail
     const project = await Project.findOne({
@@ -498,7 +509,6 @@ app.post("/api/newtask", async (req, res) => {
       .json({ error: "Error creating project.", details: error.message });
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
