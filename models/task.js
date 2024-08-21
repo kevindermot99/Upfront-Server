@@ -10,7 +10,7 @@ const taskSchema = new mongoose.Schema({
   boardId: { type: String, required: false },
   curentStatus: { type: String, required: false },
   projectId: { type: String, required: false },
-  userEmail: { type: String, required: false, match: /.+\@.+\..+/  },
+  user_email: { type: String, required: false, match: /.+\@.+\..+/  },
   assignedTo: [{ type: String, required: false, match: /.+\@.+\..+/ }]
 }, { timestamps: { createdAt: true, updatedAt: true } });
 
