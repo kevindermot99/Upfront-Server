@@ -372,7 +372,7 @@ app.patch("/api/updateprojectdetails", async (req, res) => {
     );
 
     if (!project)
-      return res.status(404).json({ message: "ndaq Project not found" });
+      return res.status(404).json({ message: "ndaq Project not found", name: project.name });
 
     res.status(200).json({ name: project.name, desc: project.desc });
   } catch (err) {
