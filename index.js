@@ -466,6 +466,39 @@ app.get("/api/getboards", async (req, res) => {
   }
 });
 
+// create Task
+app.post("/api/newtask", async (req, res) => {
+  const { newBoardValue, projectId, userEmail } = req.body; // Added collaborations
+  try {
+    // Find the workspace by userEmail
+    const project = await Project.findOne({
+      _id: projectId,
+      user_email: userEmail,
+    });
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found." });
+    }
+
+    // Create the new project with the provided data
+    const newBoard = await new Board({
+      name: newBoardValue,
+      projectId: projectId,
+      user_email: userEmail,
+    }).save();
+
+    res.status(200).json({
+      id: newBoard._id,
+      name: newBoard.name,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res
+      .status(500)
+      .json({ error: "Error creating project.", details: error.message });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
