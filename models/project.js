@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-
-
 // Define the user schema
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: false },
@@ -10,9 +8,7 @@ const projectSchema = new mongoose.Schema({
   curentStatus: { type: String, required: false },
   collaborations: [{ type: String, required: false, match: /.+\@.+\..+/ }]
 }, { timestamps: { createdAt: true, updatedAt: true } });
-
 // Create the model
 const Project = mongoose.model("project", projectSchema);
-
 // Export the model
 module.exports = Project;
