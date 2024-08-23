@@ -11,7 +11,6 @@ const Project = require("./models/project");
 const TrashProject = require("./models/trashProject");
 const Board = require("./models/board");
 const Task = require("./models/task");
-
 const app = express();
 app.use(express.json());
 const port = 5000;
@@ -22,9 +21,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-
 mongoose.connect(process.env.MONGODB_URI);
-
 // Hello
 app.get("/", async (req, res) => {
   try {
@@ -33,11 +30,9 @@ app.get("/", async (req, res) => {
     res.json({ msg: "Server error" });
   }
 });
-
 // Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -58,11 +53,9 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // Sign up
 app.post("/api/signup", async (req, res) => {
   const { userName, email, password, securityQ, securityQAnswer } = req.body;
-
   try {
     if (await User.findOne({ email })) {
       return res.status(401).json({ msg: "User already exists" });
@@ -82,7 +75,6 @@ app.post("/api/signup", async (req, res) => {
       user_email: email,
     });
     await newWorkSpace.save();
-
     res.status(200).json({
       luemail: email,
       luname: userName,
@@ -93,11 +85,9 @@ app.post("/api/signup", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // forgotPassword
 app.post("/api/verifyEmail", async (req, res) => {
   const { email } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -111,7 +101,6 @@ app.post("/api/verifyEmail", async (req, res) => {
 });
 app.post("/api/verifyAnswer", async (req, res) => {
   const { email, answer } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -129,20 +118,16 @@ app.post("/api/verifyAnswer", async (req, res) => {
 });
 app.post("/api/newPassword", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ msg: "User not found" });
-
     user.password = await bcrypt.hash(password, 10);
     await user.save();
-
     res.status(200).json({ msg: "Password updated successfully" });
   } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // Update workspace1
 app.patch("/api/updateWorkspace1", async (req, res) => {
   const { w1, userEmail } = req.body;
@@ -152,11 +137,9 @@ app.patch("/api/updateWorkspace1", async (req, res) => {
       { workspace1: w1 },
       { new: true }
     );
-
     if (!result) {
       return res.status(404).json({ message: "Workspace not found" });
     }
-
     res.status(200).json(result);
   } catch (err) {
     res
@@ -164,14 +147,12 @@ app.patch("/api/updateWorkspace1", async (req, res) => {
       .json({ message: "Error updating workspace", error: err.message });
   }
 });
-
 // get users workspaces
 app.get("/api/workspaces", async (req, res) => {
   const { userEmail } = req.query;
   try {
     const user = await User.findOne({ email: userEmail });
     if (!user) return res.status(401).json({ msg: "User not found" });
-
     const space = await Workspace.findOne({ user_email: userEmail });
     res.json({
       dbw1: space.workspace1,
@@ -180,7 +161,6 @@ app.get("/api/workspaces", async (req, res) => {
     res.json({ msg: "Server error", error: error });
   }
 });
-
 // get users
 app.get("/api/getusers", async (req, res) => {
   try {
@@ -192,7 +172,6 @@ app.get("/api/getusers", async (req, res) => {
       .json({ message: "Failed to fetch users", error: error.message });
   }
 });
-
 // get me
 app.get("/api/getme", async (req, res) => {
   const { email } = req.query;
@@ -206,41 +185,35 @@ app.get("/api/getme", async (req, res) => {
     res.status(401).json({ msg: "Server error" });
   }
 });
-
 // get my projects
 app.get("/api/getmyprojects", async (req, res) => {
   const { email } = req.query;
   try {
     const user = await User.findOne({ email: email });
     if (!user) return res.status(401).json({ msg: "User not found" });
-
     const projects = await Project.find({ user_email: email });
     res.status(200).json({ projects: projects });
   } catch (error) {
     res.status(400).json({ msg: "Server error", error: error });
   }
 });
-
 // create project
 app.post("/api/createProject", async (req, res) => {
   const { name, desc, userEmail, workspace, collaborations } = req.body; // Added collaborations
   try {
     // Find the workspace by userEmail
     const workspaceDoc = await Workspace.findOne({ user_email: userEmail });
-
     if (!workspaceDoc) {
       return res
         .status(404)
         .json({ error: "Workspace not found for the given user email." });
     }
     let workspaceId;
-
     if (workspace === "w1") {
       workspaceId = workspaceDoc._id;
     } else {
       return res.status(400).json({ error: "Invalid workspace identifier." });
     }
-
     // Create the new project with the provided data
     const newProject = await new Project({
       name,
@@ -250,7 +223,6 @@ app.post("/api/createProject", async (req, res) => {
       curentStatus: "active",
       collaborations, // Added the collaborations array
     }).save();
-
     res.status(200).json({
       id: newProject._id,
       workspace: newProject.workspace,
@@ -263,7 +235,6 @@ app.post("/api/createProject", async (req, res) => {
       .json({ error: "Error creating project.", details: error.message });
   }
 });
-
 // get Project data
 app.get("/api/getproject", async (req, res) => {
   const id = req.query.id;
@@ -274,7 +245,6 @@ app.get("/api/getproject", async (req, res) => {
     }
     const user = await User.findOne({ email: userEmail });
     if (!user) return res.status(401).json({ msg: "User not found" });
-
     const project = await Project.findOne({ _id: id, user_email: userEmail });
     if (!project) return res.status(401).json({ msg: "Project not found" });
     res.status(200).json(project);
@@ -282,25 +252,20 @@ app.get("/api/getproject", async (req, res) => {
     res.status(400).json({ msg: "Server error", error: error });
   }
 });
-
 // add collaborator
 app.post("/api/addcollaborator", async (req, res) => {
   const { id, email } = req.body;
-
   try {
     // Find the project by ID
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ msg: "Project not found" });
-
     // Check if the email is already in the collaborations array
     if (project.collaborations.includes(email)) {
       return res.status(400).json({ msg: "User already a collaborator" });
     }
-
     // Add the new collaborator to the collaborations array
     project.collaborations.push(email);
     await project.save();
-
     res.status(200).json({
       newCollaborators: project.collaborations,
       msg: "Collaborator added successfully",
@@ -310,27 +275,22 @@ app.post("/api/addcollaborator", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // remove collaborator
 app.post("/api/removecollaborator", async (req, res) => {
   const { id, email } = req.body;
-
   try {
     // Find the project by ID
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ msg: "Project not found" });
-
     // Check if the email is in the collaborations array
     if (!project.collaborations.includes(email)) {
       return res.status(400).json({ msg: "User is not a collaborator" });
     }
-
     // Remove the collaborator from the collaborations array
     project.collaborations = project.collaborations.filter(
       (collab) => collab !== email
     );
     await project.save();
-
     res.status(200).json({
       newCollaborators: project.collaborations,
       msg: "Collaborator removed successfully",
@@ -340,15 +300,12 @@ app.post("/api/removecollaborator", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // Get my collaborations
 app.get("/api/getcollaborations", async (req, res) => {
   const { email } = req.query;
-
   if (!email) {
     return res.status(400).json({ msg: "Email is required" });
   }
-
   try {
     const projects = await Project.find({
       collaborations: email,
@@ -360,7 +317,6 @@ app.get("/api/getcollaborations", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // Update project
 app.patch("/api/updateprojectdetails", async (req, res) => {
   const { newTitle, newDesc, projectid, userEmail } = req.body;
@@ -370,16 +326,13 @@ app.patch("/api/updateprojectdetails", async (req, res) => {
       { name: newTitle, desc: newDesc },
       { new: true } // Return the updated document
     );
-
     if (!project)
       return res.status(404).json({ message: "ndaq Project not found", name: project.name });
-
     res.status(200).json({ name: project.name, desc: project.desc });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 // delete project
 app.post("/api/movetotrash", async (req, res) => {
   const { projectId, userEmail } = req.body;
@@ -391,7 +344,6 @@ app.post("/api/movetotrash", async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
     // Create the new project with the provided data
     const trashedProject = await new TrashProject({
       _id: project._id,
@@ -402,7 +354,6 @@ app.post("/api/movetotrash", async (req, res) => {
       curentStatus: project.curentStatus,
       collaborations: project.collaborations,
     }).save();
-
     // delete the data in project model
     await Project.deleteOne({
       _id: projectId,
@@ -413,7 +364,6 @@ app.post("/api/movetotrash", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // create board
 app.post("/api/newboard", async (req, res) => {
   const { newBoardValue, projectId, userEmail } = req.body; // Added collaborations
@@ -423,18 +373,15 @@ app.post("/api/newboard", async (req, res) => {
       _id: projectId,
       user_email: userEmail,
     });
-
     if (!project) {
       return res.status(404).json({ error: "Project not found." });
     }
-
     // Create the new project with the provided data
     const newBoard = await new Board({
       name: newBoardValue,
       projectId: projectId,
       user_email: userEmail,
     }).save();
-
     res.status(200).json({
       id: newBoard._id,
       name: newBoard.name,
@@ -446,14 +393,12 @@ app.post("/api/newboard", async (req, res) => {
       .json({ error: "Error creating project.", details: error.message });
   }
 });
-
 // get my boards
 app.get("/api/getboards", async (req, res) => {
   const { projectId, email } = req.query;
   try {
     const project = await Project.findOne({ user_email: email });
     if (!project) return res.status(401).json({ msg: "project not found" });
-
     const boards = await Board.find({
       projectId: projectId,
       user_email: email,
@@ -463,13 +408,11 @@ app.get("/api/getboards", async (req, res) => {
       id: board._id,
       name: board.name,
     }));
-
     res.status(200).json(boardData);
   } catch (error) {
     res.status(400).json({ msg: "Server error", error: error });
   }
 });
-
 // create Task
 app.post("/api/newtask", async (req, res) => {
   const {
@@ -488,21 +431,17 @@ app.post("/api/newtask", async (req, res) => {
       _id: projectId,
       user_email: userEmail,
     });
-
     if (!project) {
       return res.status(404).json({ error: "Project not found." });
     }
-
     // Find the board by id and userEmail
     const board = await Board.findOne({
       _id: boardId,
       user_email: userEmail,
     });
-
     if (!board) {
       return res.status(404).json({ error: "Board not found." });
     }
-
     // Create the new task with the provided data
     const newTask = await new Task({
       name: newTaskName,
@@ -515,7 +454,6 @@ app.post("/api/newtask", async (req, res) => {
       user_email: userEmail,
       assignedTo: assignedTo,
     }).save();
-
     res.status(200).json({
       id: newTask._id,
       name: newTask.name,
@@ -532,14 +470,12 @@ app.post("/api/newtask", async (req, res) => {
       .json({ error: "Error creating Task.", details: error.message });
   }
 });
-
 // get my Tasks
 app.get("/api/gettasks", async (req, res) => {
   const { projectId, email } = req.query;
   try {
     const project = await Project.findOne({ user_email: email });
     if (!project) return res.status(401).json({ msg: "project not found" });
-
     const tasks = await Task.find({
       projectId: projectId,
       user_email: email,
@@ -554,13 +490,11 @@ app.get("/api/gettasks", async (req, res) => {
       due: task.due,
       boardId: task.boardId,
     })); 
-
     res.status(200).json(taskData);
   } catch (error) {
     res.status(400).json({ msg: "Server error", error: error });
   }
 });
-
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
